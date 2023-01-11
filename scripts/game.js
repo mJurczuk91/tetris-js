@@ -33,7 +33,7 @@ class State{
     }
 
     isColliding(state, x, y){
-        if(x < 0 || x > 11 || y < 0 || y > 15) return true;
+        if(x < 0 || x > GAME_WIDTH - 1 || y < 0 || y > GAME_HEIGHT - 1) return true;
         else return state.grid[y][x];
     }
 
@@ -96,17 +96,17 @@ class State{
         return finishedRows;
     }
 
-    shiftGridDownAtRow(row, grid){
-        let gr = grid;
+    shiftGridDownAtRow(row, gr){
+        let grid = gr;
         for(let y = row-1; y >= 0; y--){
             for(let x = 0; x < GAME_WIDTH; x++){
-                if(gr[y][x]){
-                    gr[y][x] = false;
-                    gr[y+1][x] = true;
+                if(grid[y][x]){
+                    grid[y][x] = false;
+                    grid[y+1][x] = true;
                 }
             }
         }
-        return gr;
+        return grid;
     }
 
     removeRow(row, state){
