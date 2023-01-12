@@ -1,0 +1,23 @@
+{
+  "name": "tetris",
+  "version": "1.0.0",
+  "description": "just having a go at coding simple tetris game using js, html and css to refresh my memory on the basics",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mJurczuk91/tetris-js.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mJurczuk91/tetris-js/issues"
+  },
+  "homepage": "https://github.com/mJurczuk91/tetris-js#readme",
+  "devDependencies": {
+    "jest": "^29.3.1"
+  }
+}
