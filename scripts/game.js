@@ -164,3 +164,5 @@ async function game(){
         draw(state);
     }, 100);
 }
+
+module.exports = State;

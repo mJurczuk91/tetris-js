@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/mJurczuk91/tetris-js#readme",
   "devDependencies": {
-    "jest": "^29.3.1"
+    "jest": "^29.3.1",
+    "jest-environment-jsdom": "^29.3.1"
   }
 }
