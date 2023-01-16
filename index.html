@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <script src="scripts/game.js"></script>
+    <script type="module" src="scripts/piece.js"></script>
+    <script type="module" src="scripts/state.js"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
     <div class="scoreDisplay">
         <p id="score"></p>
@@ -15,8 +18,10 @@
     <div class="displayContainer">
         <canvas class="display" id="display"></canvas>
     </div>
-    <script>
+    <script type="module">
+        import {game} from "./scripts/game.js";
         game();
     </script>
 </body>
+
 </html>
