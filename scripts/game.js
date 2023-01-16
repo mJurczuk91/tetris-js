@@ -1,5 +1,5 @@
 const GAME_HEIGHT = 16;
-const GAME_WIDTH = 12;
+const GAME_WIDTH = 10;
 const PX_SCALE = 40;
 
 class Piece{
@@ -92,7 +92,6 @@ class State{
                 finishedRows.push(y);
             }
         }
-        console.log(finishedRows);
         return finishedRows;
     }
 
@@ -162,7 +161,9 @@ async function game(){
     setInterval(() => {
         state = state.update(state, pressedKeys);
         draw(state);
-    }, 100);
+    }, 50);
 }
 
-module.exports = State;
+exports.State = State;
+exports.GAME_HEIGHT = GAME_HEIGHT;
+exports.GAME_WIDTH = GAME_WIDTH;
