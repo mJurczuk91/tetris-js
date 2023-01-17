@@ -201,15 +201,17 @@ const SHAPES = {
 };
 
 class Piece {
-    constructor(px = 0, py = 0, rotation = 0, shape = Math.floor(Math.random() * 8)){
-        this.px = px;
+    constructor(py = 0, px = 0, rotation = 0, shape = Math.floor(Math.random() * 8)){
         this.py = py;
-        this.rotation = 0;
+        this.px = px;
+        this.rotation = rotation;
         this.shape = shape;
     }
 
-    rotate(){
-        this.rotation = (this.rotation + 1) % 4;
+    rotate(piece){
+        let rotation = (piece.rotation +1) % 4;
+        console.log(rotation);
+        return new Piece(piece.py, piece.px, rotation, piece.shape);
     }
 
     get(y, x){
@@ -218,15 +220,15 @@ class Piece {
     }
 
     moveLeft(piece){
-        return new Piece(piece.px -1, piece.py, piece.rotation, piece.shape);
+        return new Piece(piece.py, piece.px -1, piece.rotation, piece.shape);
     }
 
     moveRight(piece){
-        return new Piece(piece.px +1, piece.py, piece.rotation, piece.shape);
+        return new Piece(piece.py, piece.px +1, piece.rotation, piece.shape);
     }
 
     moveDown(piece){
-        return new Piece(piece.px, piece.py + 1, piece.rotation, piece.shape);
+        return new Piece(piece.py +1, piece.px, piece.rotation, piece.shape);
     }
 }
 

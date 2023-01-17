@@ -45,6 +45,9 @@ class State{
 
     update(state, pressedKeys){
         let timer = state.updateTimer + 10;
+        console.log(pressedKeys);
+        state = this._rotatePiece(state, pressedKeys);
+
         state = this._updateHor(state, pressedKeys);
 
         if(timer >= 100){
@@ -65,6 +68,14 @@ class State{
             p.innerText = state.score + scoreGained;
         }
         return new State(state.grid, state.piece, state.status, timer, state.score + scoreGained);
+    }
+
+    _rotatePiece(state, pressedKeys){
+        let piece = state.piece;
+        if(pressedKeys["z"]){
+            piece = this.isPieceColliding(state, state.piece.rotate(piece)) ? piece : state.piece.rotate(piece);
+        }
+        return new State(state.grid, piece, state.status, state.timer, state.score);
     }
 
     _updateHor(state, pressedKeys){
