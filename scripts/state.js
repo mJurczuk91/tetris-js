@@ -27,9 +27,20 @@ class State{
         return new State(grid, piece, status);
     }
 
-    isColliding(state, x, y){
+    isPointColliding(state, y, x){
         if(x < 0 || x > GAME_WIDTH - 1 || y < 0 || y > GAME_HEIGHT - 1) return true;
         else return state.grid[y][x];
+    }
+
+    isPieceColliding(state, piece){
+        for(let py = 0; py < 4; py++){
+            for(let px = 0; px < 4; px++){
+                if(piece.get(py, px) && this.isPointColliding(state, piece.py+py, piece.px+px)){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     update(state, pressedKeys){
@@ -59,10 +70,10 @@ class State{
     _updateHor(state, pressedKeys){
         let piece = state.piece;
         if(pressedKeys["ArrowLeft"]){
-            piece = this.isColliding(state, piece.x - 1, piece.y) ? piece : new Piece(piece.x - 1, piece.y);
+            piece = this.isPieceColliding(state, state.piece.moveLeft(state.piece)) ? piece : state.piece.moveLeft(state.piece);
         } else
         if(pressedKeys["ArrowRight"]){
-            piece = this.isColliding(state, piece.x + 1, piece.y) ? piece : new Piece(piece.x + 1, piece.y);
+            piece = this.isPieceColliding(state, state.piece.moveRight(state.piece)) ? piece : state.piece.moveRight(state.piece);
         }
         return new State(state.grid, piece, state.status, state.timer, state.score);
     }
@@ -70,12 +81,18 @@ class State{
     _updateVert(state){
         let piece = state.piece;
         let grid = state.grid;
-        if(this.isColliding(state, piece.x, piece.y + 1)){
-            grid[piece.y][piece.x] = true;
+        if(this.isPieceColliding(state, state.piece.moveDown(state.piece))){
+            for(let y = 0; y < 4; y++){
+                for(let x = 0; x < 4; x++){
+                    if(state.piece.get(y, x)){
+                        state.grid[state.piece.py+y][state.piece.px+x] = true;
+                    }
+                }
+            }
             piece = new Piece();
         }
         else {
-            piece = new Piece(piece.x, piece.y + 1);
+            piece = state.piece.moveDown(state.piece);
         }
         return new State(grid, piece, state.status, state.timer, state.score);
     }
@@ -112,7 +129,6 @@ class State{
         return new State(grid, state.piece, state.status, state.timer, state.score);
     }
 }
-
 
 
 export {

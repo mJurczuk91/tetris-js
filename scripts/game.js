@@ -2,12 +2,16 @@ import {State, GAME_HEIGHT, GAME_WIDTH, PX_SCALE} from "./state.js";
 
 function draw(state) {
     let cx = document.getElementById("display").getContext("2d");
+    cx.fillStyle = "white";
+    cx.fillRect(0,0,PX_SCALE * GAME_WIDTH, PX_SCALE * GAME_HEIGHT);
 
+    cx.fillStyle = "black";
     //draw grid
     for (let y = 0; y < GAME_HEIGHT; y++) {
         for (let x = 0; x < GAME_WIDTH; x++) {
-            state.grid[y][x] ? cx.fillStyle = "gray" : cx.fillStyle = "white";
-            cx.fillRect(x * PX_SCALE, y * PX_SCALE, PX_SCALE, PX_SCALE);
+            if(state.grid[y][x]){
+                cx.fillRect(x * PX_SCALE, y * PX_SCALE, PX_SCALE, PX_SCALE);
+            }
         }
     }
 
@@ -36,7 +40,6 @@ function trackKeys(keys) {
         if (keys.includes(event.key)) {
             pressed[event.key] = event.type == "keydown";
             event.preventDefault();
-            console.log(pressed);
         }
     }
 

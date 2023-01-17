@@ -201,11 +201,11 @@ const SHAPES = {
 };
 
 class Piece {
-    constructor(px, py){
+    constructor(px = 0, py = 0, rotation = 0, shape = Math.floor(Math.random() * 8)){
         this.px = px;
         this.py = py;
         this.rotation = 0;
-        this.shape = Math.floor(Math.random() * 8);
+        this.shape = shape;
     }
 
     rotate(){
@@ -215,6 +215,18 @@ class Piece {
     get(y, x){
         let value = SHAPES[this.shape][this.rotation][y][x];
         return Boolean(value);
+    }
+
+    moveLeft(piece){
+        return new Piece(piece.px -1, piece.py, piece.rotation, piece.shape);
+    }
+
+    moveRight(piece){
+        return new Piece(piece.px +1, piece.py, piece.rotation, piece.shape);
+    }
+
+    moveDown(piece){
+        return new Piece(piece.px, piece.py + 1, piece.rotation, piece.shape);
     }
 }
 
