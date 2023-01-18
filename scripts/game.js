@@ -1,17 +1,14 @@
 import {State, GAME_HEIGHT, GAME_WIDTH, PX_SCALE} from "./state.js";
 
-function draw(state) {
-    let cx = document.getElementById("display").getContext("2d");
-    cx.fillStyle = "white";
-    cx.fillRect(0,0,PX_SCALE * GAME_WIDTH, PX_SCALE * GAME_HEIGHT);
+function draw(state, cx) {
+/*     cx.fillStyle = "white";
+    cx.fillRect(0,0,PX_SCALE * GAME_WIDTH, PX_SCALE * GAME_HEIGHT); */
 
-    cx.fillStyle = "black";
     //draw grid
     for (let y = 0; y < GAME_HEIGHT; y++) {
         for (let x = 0; x < GAME_WIDTH; x++) {
-            if(state.grid[y][x]){
-                cx.fillRect(x * PX_SCALE, y * PX_SCALE, PX_SCALE, PX_SCALE);
-            }
+            cx.fillStyle = state.grid[y][x] ? "black" : "white";
+            cx.fillRect(x * PX_SCALE, y * PX_SCALE, PX_SCALE, PX_SCALE);
         }
     }
 
@@ -32,6 +29,8 @@ function init() {
     cv.setAttribute("width", GAME_WIDTH * PX_SCALE);
     let p = document.getElementById("score");
     p.innerText = 0;
+    let cx = document.getElementById("display").getContext("2d");
+    return cx;
 }
 
  function trackKeys(keys) {
@@ -50,9 +49,9 @@ function init() {
 }
 
 function game() {
-    init();
+    let cx = init();
     let state = State.start();
-    draw(state);
+    draw(state, cx);
     let keys = ["ArrowLeft", "ArrowRight", "ArrowDown", "z"];
 
     let pressedKeys = trackKeys(keys);
@@ -86,7 +85,7 @@ function game() {
         if(Object.keys(finalKeys).length > 0){
             if(finalKeys["ArrowDown"]) {lastStep = time};
             state = state.update(state, finalKeys);
-            draw(state);
+            draw(state, cx);
         }
 
         if(time - lastStep > 500){
@@ -94,7 +93,7 @@ function game() {
             pressedDown["ArrowDown"] = true;
             lastStep = time;
             state = state.update(state, pressedDown);
-            draw(state);
+            draw(state, cx);
         }
         requestAnimationFrame(run);
     }
