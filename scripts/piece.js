@@ -210,7 +210,6 @@ class Piece {
 
     rotate(piece){
         let rotation = (piece.rotation +1) % 4;
-        console.log(rotation);
         return new Piece(piece.py, piece.px, rotation, piece.shape);
     }
 

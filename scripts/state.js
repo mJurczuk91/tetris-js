@@ -5,11 +5,10 @@ const GAME_WIDTH = 10;
 const PX_SCALE = 40;
 
 class State{
-    constructor(grid, piece, status, timer = 0, score = 0){
+    constructor(grid, piece, status, score = 0){
         this.grid = grid;
         this.piece = piece;
         this.status = status;
-        this.updateTimer = timer;
         this.score = score;
     }
 
@@ -44,16 +43,14 @@ class State{
     }
 
     update(state, pressedKeys){
-        let timer = state.updateTimer + 10;
-        console.log(pressedKeys);
-        state = this._rotatePiece(state, pressedKeys);
 
-        state = this._updateHor(state, pressedKeys);
-
-        if(timer >= 100){
-            timer = 0;
-            state = this._updateVert(state);
-        } else if (pressedKeys["ArrowDown"]){
+        if(pressedKeys["z"]){
+            state = this._rotatePiece(state, pressedKeys);
+        }
+        if(pressedKeys["ArrowLeft"] || pressedKeys["ArrowRight"]){
+            state = this._updateHor(state, pressedKeys);
+        }
+        if (pressedKeys["ArrowDown"]){
             state = this._updateVert(state);
         }
 
@@ -67,15 +64,12 @@ class State{
             let p = document.getElementById("score");
             p.innerText = state.score + scoreGained;
         }
-        return new State(state.grid, state.piece, state.status, timer, state.score + scoreGained);
+        return new State(state.grid, state.piece, state.status, state.score + scoreGained);
     }
 
-    _rotatePiece(state, pressedKeys){
-        let piece = state.piece;
-        if(pressedKeys["z"]){
-            piece = this.isPieceColliding(state, state.piece.rotate(piece)) ? piece : state.piece.rotate(piece);
-        }
-        return new State(state.grid, piece, state.status, state.timer, state.score);
+    _rotatePiece(state){
+        let piece = this.isPieceColliding(state, state.piece.rotate(state.piece)) ? state.piece : state.piece.rotate(state.piece);
+        return new State(state.grid, piece, state.status, state.score);
     }
 
     _updateHor(state, pressedKeys){
@@ -86,7 +80,7 @@ class State{
         if(pressedKeys["ArrowRight"]){
             piece = this.isPieceColliding(state, state.piece.moveRight(state.piece)) ? piece : state.piece.moveRight(state.piece);
         }
-        return new State(state.grid, piece, state.status, state.timer, state.score);
+        return new State(state.grid, piece, state.status, state.score);
     }
 
     _updateVert(state){
@@ -105,7 +99,7 @@ class State{
         else {
             piece = state.piece.moveDown(state.piece);
         }
-        return new State(grid, piece, state.status, state.timer, state.score);
+        return new State(grid, piece, state.status, state.score);
     }
 
     getCompletedRows(state){
@@ -137,7 +131,7 @@ class State{
             grid[row][i]=false;
         }
         grid = this.shiftGridDownAtRow(row, grid);
-        return new State(grid, state.piece, state.status, state.timer, state.score);
+        return new State(grid, state.piece, state.status, state.score);
     }
 }
 

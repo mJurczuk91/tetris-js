@@ -24,7 +24,7 @@ function draw(state) {
             }
         }
     }
-};
+}
 
 function init() {
     let cv = document.getElementsByClassName("display")[0];
@@ -32,9 +32,9 @@ function init() {
     cv.setAttribute("width", GAME_WIDTH * PX_SCALE);
     let p = document.getElementById("score");
     p.innerText = 0;
-};
+}
 
-function trackKeys(keys) {
+ function trackKeys(keys) {
     let pressed = Object.create(null);
     function track(event) {
         if (keys.includes(event.key)) {
@@ -47,18 +47,58 @@ function trackKeys(keys) {
     window.addEventListener("keyup", track);
 
     return pressed;
-};
-
-let pressedKeys = trackKeys(["ArrowLeft", "ArrowRight", "ArrowDown", "z"]);
+}
 
 function game() {
     init();
     let state = State.start();
     draw(state);
-    setInterval(() => {
-        state = state.update(state, pressedKeys);
-        draw(state);
-    }, 50);
-};
+    let keys = ["ArrowLeft", "ArrowRight", "ArrowDown", "z"];
+
+    let pressedKeys = trackKeys(keys);
+    let throttledKeys = Object.create(null);
+    let throttleTiming = {
+        "ArrowLeft": 100,
+        "ArrowRight": 100,
+        "ArrowDown": 100,
+        "z": 200
+    }
+
+    for(let k of keys){
+        throttledKeys[k] = performance.now();
+    }
+
+    let lastStep;
+    function run(time){
+        if(lastStep === undefined){
+            lastStep = time;
+        }
+
+        let finalKeys = Object.create(null);
+
+        for(let key of Object.keys(pressedKeys)){
+            if(pressedKeys[key] && time - throttledKeys[key] > throttleTiming[key]){
+                throttledKeys[key] = time;
+                finalKeys[key] = true;
+            }
+        }
+
+        if(Object.keys(finalKeys).length > 0){
+            if(finalKeys["ArrowDown"]) {lastStep = time};
+            state = state.update(state, finalKeys);
+            draw(state);
+        }
+
+        if(time - lastStep > 500){
+            let pressedDown = Object.create(null);
+            pressedDown["ArrowDown"] = true;
+            lastStep = time;
+            state = state.update(state, pressedDown);
+            draw(state);
+        }
+        requestAnimationFrame(run);
+    }
+    requestAnimationFrame(run);
+}
 
 export {game};
