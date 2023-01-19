@@ -1,9 +1,6 @@
 import {State, GAME_HEIGHT, GAME_WIDTH, PX_SCALE} from "./state.js";
 
 function draw(state, cx) {
-/*     cx.fillStyle = "white";
-    cx.fillRect(0,0,PX_SCALE * GAME_WIDTH, PX_SCALE * GAME_HEIGHT); */
-
     //draw grid
     for (let y = 0; y < GAME_HEIGHT; y++) {
         for (let x = 0; x < GAME_WIDTH; x++) {
@@ -81,7 +78,7 @@ function game() {
     let state = State.start();
     draw(state, cx);
 
-    let keys = ["ArrowLeft", "ArrowRight", "ArrowDown", "z"];
+    const keys = ["ArrowLeft", "ArrowRight", "ArrowDown", "z"];
     let pressedKeys = trackKeys(keys);
     let throttledKeys = Object.create(null);
     let throttleTiming = {
