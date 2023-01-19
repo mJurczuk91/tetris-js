@@ -21,7 +21,7 @@ class State{
             }
             grid.push(row);
         }
-        let piece = new Piece(Math.floor(GAME_WIDTH / 2), 0);
+        let piece = new Piece(0, (GAME_WIDTH / 2) - 2);
         let status = "playing";
         return new State(grid, piece, status);
     }
@@ -86,6 +86,7 @@ class State{
     _updateVert(state){
         let piece = state.piece;
         let grid = state.grid;
+        let status = state.status;
         if(this.isPieceColliding(state, state.piece.moveDown(state.piece))){
             for(let y = 0; y < 4; y++){
                 for(let x = 0; x < 4; x++){
@@ -94,13 +95,25 @@ class State{
                     }
                 }
             }
-            piece = new Piece();
+            piece = new Piece(0, (GAME_WIDTH / 2) - 2);
+
+            /* 
+            jeżeli nowy kształt od razu koliduje z tłem, gra jest przegrana
+            ustawiamy odpowiedni status, dodajemy kształt do tła, i 
+            ustawiamy wszystkie pola kształtu na false żeby nie był on wyświetlany
+             */
+
+            if(this.isPieceColliding(state, piece.moveDown(piece)) && piece.py == 0){
+                status = "lost";
+            }
         }
         else {
             piece = state.piece.moveDown(state.piece);
         }
-        return new State(grid, piece, state.status, state.score);
+        return new State(grid, piece, status, state.score);
     }
+
+
 
     getCompletedRows(state){
         let finishedRows = [];

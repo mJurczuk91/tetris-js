@@ -48,12 +48,40 @@ function init() {
     return pressed;
 }
 
+function runLostAnimation(state, cx){
+    let start = performance.now();
+
+    function animate(time){
+        let step = time - start;
+        for (let y = 0; y < 4; y++) {
+            for (let x = 0; x < 4; x++) {
+                if (state.piece.get(y, x)) {
+
+                    cx.fillStyle = `rgb(
+                        ${Math.max(
+                            100, 
+                            Math.floor((step + (3 * x)) % 255))},
+                        0,
+                        0
+                    )`;
+                    
+                    cx.fillRect((state.piece.px + x) * PX_SCALE, (state.piece.py + y) * PX_SCALE, PX_SCALE, PX_SCALE);
+                }
+            }
+        }
+        if(time - start < 4000){
+            requestAnimationFrame(animate);
+        }
+    }
+    requestAnimationFrame(animate);
+}
+
 function game() {
     let cx = init();
     let state = State.start();
     draw(state, cx);
-    let keys = ["ArrowLeft", "ArrowRight", "ArrowDown", "z"];
 
+    let keys = ["ArrowLeft", "ArrowRight", "ArrowDown", "z"];
     let pressedKeys = trackKeys(keys);
     let throttledKeys = Object.create(null);
     let throttleTiming = {
@@ -68,6 +96,7 @@ function game() {
     }
 
     let lastStep;
+
     function run(time){
         if(lastStep === undefined){
             lastStep = time;
@@ -95,7 +124,14 @@ function game() {
             state = state.update(state, pressedDown);
             draw(state, cx);
         }
-        requestAnimationFrame(run);
+        
+        if(state.status == "playing"){
+            requestAnimationFrame(run);
+        }
+        else {
+            lastStep = performance.now();
+            runLostAnimation(state, cx);
+        }
     }
     requestAnimationFrame(run);
 }
