@@ -20,7 +20,11 @@
     </div>
     <script type="module">
         import {game} from "./scripts/game.js";
-        game();
+        async function playGame(){
+            let score = await game();
+            console.log(score);
+        }
+        playGame();
     </script>
 </body>
 

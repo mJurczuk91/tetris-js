@@ -48,29 +48,32 @@ function init() {
 function runLostAnimation(state, cx){
     let start = performance.now();
 
-    function animate(time){
-        let step = time - start;
-        for (let y = 0; y < 4; y++) {
-            for (let x = 0; x < 4; x++) {
-                if (state.piece.get(y, x)) {
-
-                    cx.fillStyle = `rgb(
-                        ${Math.max(
-                            100, 
-                            Math.floor((step + (3 * x)) % 255))},
-                        0,
-                        0
-                    )`;
-                    
-                    cx.fillRect((state.piece.px + x) * PX_SCALE, (state.piece.py + y) * PX_SCALE, PX_SCALE, PX_SCALE);
+    return new Promise((resolve => {
+        function animate(time){
+            let step = time - start;
+            for (let y = 0; y < 4; y++) {
+                for (let x = 0; x < 4; x++) {
+                    if (state.piece.get(y, x)) {
+    
+                        cx.fillStyle = `rgb(
+                            ${Math.max(
+                                100, 
+                                Math.floor((step + (3 * x)) % 255))},
+                            0,
+                            0
+                        )`;
+                        
+                        cx.fillRect((state.piece.px + x) * PX_SCALE, (state.piece.py + y) * PX_SCALE, PX_SCALE, PX_SCALE);
+                    }
                 }
             }
+            if(time - start < 4000){
+                requestAnimationFrame(animate);
+            }
+            else resolve(state.score);
         }
-        if(time - start < 4000){
-            requestAnimationFrame(animate);
-        }
-    }
-    requestAnimationFrame(animate);
+        requestAnimationFrame(animate);
+    }))
 }
 
 function game() {
@@ -94,43 +97,46 @@ function game() {
 
     let lastStep;
 
-    function run(time){
-        if(lastStep === undefined){
-            lastStep = time;
-        }
-
-        let finalKeys = Object.create(null);
-
-        for(let key of Object.keys(pressedKeys)){
-            if(pressedKeys[key] && time - throttledKeys[key] > throttleTiming[key]){
-                throttledKeys[key] = time;
-                finalKeys[key] = true;
+    return new Promise((resolve) => {
+        function run(time){
+            if(lastStep === undefined){
+                lastStep = time;
+            }
+    
+            let finalKeys = Object.create(null);
+    
+            for(let key of Object.keys(pressedKeys)){
+                if(pressedKeys[key] && time - throttledKeys[key] > throttleTiming[key]){
+                    throttledKeys[key] = time;
+                    finalKeys[key] = true;
+                }
+            }
+    
+            if(Object.keys(finalKeys).length > 0){
+                if(finalKeys["ArrowDown"]) {lastStep = time};
+                state = state.update(state, finalKeys);
+                draw(state, cx);
+            }
+    
+            if(time - lastStep > 500){
+                let pressedDown = Object.create(null);
+                pressedDown["ArrowDown"] = true;
+                lastStep = time;
+                state = state.update(state, pressedDown);
+                draw(state, cx);
+            }
+            
+            if(state.status == "playing"){
+                requestAnimationFrame(run);
+            }
+            else {
+                lastStep = performance.now();
+                resolve(runLostAnimation(state, cx));
             }
         }
-
-        if(Object.keys(finalKeys).length > 0){
-            if(finalKeys["ArrowDown"]) {lastStep = time};
-            state = state.update(state, finalKeys);
-            draw(state, cx);
-        }
-
-        if(time - lastStep > 500){
-            let pressedDown = Object.create(null);
-            pressedDown["ArrowDown"] = true;
-            lastStep = time;
-            state = state.update(state, pressedDown);
-            draw(state, cx);
-        }
-        
-        if(state.status == "playing"){
-            requestAnimationFrame(run);
-        }
-        else {
-            lastStep = performance.now();
-            runLostAnimation(state, cx);
-        }
-    }
-    requestAnimationFrame(run);
+        requestAnimationFrame(run);
+    });
+    
 }
 
 export {game};
