@@ -72,6 +72,11 @@ class State{
         return new State(state.grid, piece, state.status, state.score);
     }
 
+    /**
+     * since we dont have to add piece to background and generate a new one on horizontal movement
+     * the update is broken down into separate horizontal and vertical functions
+     */
+
     _updateHor(state, pressedKeys){
         let piece = state.piece;
         if(pressedKeys["ArrowLeft"]){
@@ -98,9 +103,7 @@ class State{
             piece = new Piece(0, (GAME_WIDTH / 2) - 2);
 
             /* 
-            jeżeli nowy kształt od razu koliduje z tłem, gra jest przegrana
-            ustawiamy odpowiedni status, dodajemy kształt do tła, i 
-            ustawiamy wszystkie pola kształtu na false żeby nie był on wyświetlany
+            if the new shape collides with background on creation the game is lost
              */
 
             if(this.isPieceColliding(state, piece.moveDown(piece)) && piece.py == 0){

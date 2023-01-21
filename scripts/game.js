@@ -20,6 +20,11 @@ function draw(state, cx) {
     }
 }
 
+/**
+ * initialises canvas and other html components needed for rendering the game
+ * @returns CanvasRenderingContext2D
+ */
+
 function init() {
     let cv = document.getElementsByClassName("display")[0];
     cv.setAttribute("height", GAME_HEIGHT * PX_SCALE);
@@ -29,6 +34,11 @@ function init() {
     let cx = document.getElementById("display").getContext("2d");
     return cx;
 }
+
+/**
+ * since the inner function track(event) thats added as event listener is able to see surrounding scope through its closure
+ * its able to return the 'pressed' keys object on each button press.
+ */
 
  function trackKeys(keys) {
     let pressed = Object.create(null);
@@ -45,6 +55,12 @@ function init() {
     return pressed;
 }
 
+/**
+ * called through resolving the game() promise
+ * runs a quick animation (color changing) for the piece that lost the game
+ * returns a promise that resolves to final game score after the animation finishes
+ */
+
 function runLostAnimation(state, cx){
     let start = performance.now();
 
@@ -54,7 +70,7 @@ function runLostAnimation(state, cx){
             for (let y = 0; y < 4; y++) {
                 for (let x = 0; x < 4; x++) {
                     if (state.piece.get(y, x)) {
-    
+
                         cx.fillStyle = `rgb(
                             ${Math.max(
                                 100, 
@@ -62,12 +78,11 @@ function runLostAnimation(state, cx){
                             0,
                             0
                         )`;
-                        
                         cx.fillRect((state.piece.px + x) * PX_SCALE, (state.piece.py + y) * PX_SCALE, PX_SCALE, PX_SCALE);
                     }
                 }
             }
-            if(time - start < 4000){
+            if(time - start < 3000){
                 requestAnimationFrame(animate);
             }
             else resolve(state.score);
