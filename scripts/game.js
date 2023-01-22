@@ -26,13 +26,26 @@ function draw(state, cx) {
  */
 
 function init() {
-    let cv = document.getElementsByClassName("display")[0];
-    cv.setAttribute("height", GAME_HEIGHT * PX_SCALE);
-    cv.setAttribute("width", GAME_WIDTH * PX_SCALE);
-    let p = document.getElementById("score");
-    p.innerText = 0;
-    let cx = document.getElementById("display").getContext("2d");
-    return cx;
+    let menu = document.getElementById("menu-container");
+    menu.style.display = "none";
+
+    let gameContainer = document.createElement("div");
+    let canvas = document.createElement("canvas");
+    canvas.setAttribute("height", GAME_HEIGHT * PX_SCALE);
+    canvas.setAttribute("width", GAME_WIDTH * PX_SCALE);
+
+    let scoreDisp = document.createElement("div");
+    scoreDisp.setAttribute("id", "score-display");
+
+    let score = document.createElement("p");
+    score.setAttribute("id", "score");
+    score.innerText = 0;
+    scoreDisp.appendChild(score);
+
+    gameContainer.appendChild(scoreDisp);
+    gameContainer.appendChild(canvas);
+    document.getElementById("display-container").appendChild(gameContainer)
+    return canvas.getContext("2d");
 }
 
 /**

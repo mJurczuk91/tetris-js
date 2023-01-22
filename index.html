@@ -12,19 +12,40 @@
 </head>
 
 <body>
-    <div class="scoreDisplay">
-        <p id="score"></p>
-    </div>
-    <div class="displayContainer">
-        <canvas class="display" id="display"></canvas>
-    </div>
+    <div id="display-container"></div>
     <script type="module">
         import {game} from "./scripts/game.js";
+        import {GAME_HEIGHT, GAME_WIDTH, PX_SCALE} from "./scripts/state.js"
+
+        function menu(score = null){
+            let dispC = document.getElementById("display-container");
+
+            let div = document.createElement("div");
+            div.setAttribute("id", "menu-container");
+            div.style.height = `${GAME_HEIGHT * PX_SCALE}px`;
+            div.style.width = `${GAME_WIDTH * PX_SCALE}px`;
+
+
+            let title = document.createElement("p");
+            title.setAttribute("id", "title");
+            title.innerText = "TETRIS";
+
+            let button = document.createElement("button");
+            button.setAttribute("id", "button-start");
+            button.innerText = "Start game";
+
+            div.appendChild(title);
+            div.appendChild(button);
+
+            dispC.appendChild(div);
+            button.addEventListener("click", playGame);
+        }
+
         async function playGame(){
             let score = await game();
             console.log(score);
         }
-        playGame();
+        menu();
     </script>
 </body>
 
