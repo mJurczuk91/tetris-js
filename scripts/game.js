@@ -1,4 +1,4 @@
-import {State, GAME_HEIGHT, GAME_WIDTH, PX_SCALE} from "./state.js";
+import { State, GAME_HEIGHT, GAME_WIDTH, PX_SCALE } from "./state.js";
 
 function draw(state, cx) {
     //draw grid
@@ -20,14 +20,60 @@ function draw(state, cx) {
     }
 }
 
+function flushDisplayContainer() {
+    let dispCont = document.getElementById("display-container");
+    while (dispCont.children.length > 0) {
+        dispCont.children[0].remove();
+    }
+    return dispCont;
+}
+
+function menu(score = null) {
+    let displayContainer = flushDisplayContainer();
+
+    let menuContainer = document.createElement("div");
+    menuContainer.setAttribute("id", "menu-container");
+    menuContainer.style.height = `${GAME_HEIGHT * PX_SCALE}px`;
+    menuContainer.style.width = `${GAME_WIDTH * PX_SCALE}px`;
+
+    let button = document.createElement("button");
+    button.setAttribute("id", "button-start");
+
+    if (score === null) {
+        let title = document.createElement("p");
+        title.setAttribute("id", "title");
+        title.innerText = "TETRIS";
+
+        button.innerText = "Start game";
+
+        menuContainer.appendChild(title);
+        menuContainer.appendChild(button);
+
+        displayContainer.appendChild(menuContainer);
+        button.addEventListener("click", game);
+    }
+    else {
+        let title = document.createElement("p");
+        title.setAttribute("id", "title");
+        title.innerText = `Last Score: ${score}`;
+
+        button.innerText = "Play again?";
+
+        menuContainer.appendChild(title);
+        menuContainer.appendChild(button);
+
+        displayContainer.appendChild(menuContainer);
+        button.addEventListener("click", game);
+    }
+}
+
 /**
  * initialises canvas and other html components needed for rendering the game
  * @returns CanvasRenderingContext2D
  */
 
-function init() {
-    let menu = document.getElementById("menu-container");
-    menu.style.display = "none";
+function initGameDisplay() {
+    let dispCont = flushDisplayContainer();
 
     let gameContainer = document.createElement("div");
     let canvas = document.createElement("canvas");
@@ -44,7 +90,9 @@ function init() {
 
     gameContainer.appendChild(scoreDisp);
     gameContainer.appendChild(canvas);
-    document.getElementById("display-container").appendChild(gameContainer)
+
+    dispCont.appendChild(gameContainer)
+
     return canvas.getContext("2d");
 }
 
@@ -53,7 +101,7 @@ function init() {
  * its able to return the 'pressed' keys object on each button press.
  */
 
- function trackKeys(keys) {
+function trackKeys(keys) {
     let pressed = Object.create(null);
     function track(event) {
         if (keys.includes(event.key)) {
@@ -74,38 +122,37 @@ function init() {
  * returns a promise that resolves to final game score after the animation finishes
  */
 
-function runLostAnimation(state, cx){
+function runLostAnimation(state, cx) {
     let start = performance.now();
 
-    return new Promise((resolve => {
-        function animate(time){
-            let step = time - start;
-            for (let y = 0; y < 4; y++) {
-                for (let x = 0; x < 4; x++) {
-                    if (state.piece.get(y, x)) {
+    function animate(time) {
+        let step = time - start;
+        for (let y = 0; y < 4; y++) {
+            for (let x = 0; x < 4; x++) {
+                if (state.piece.get(y, x)) {
 
-                        cx.fillStyle = `rgb(
+                    cx.fillStyle = `rgb(
                             ${Math.max(
-                                100, 
-                                Math.floor((step + (3 * x)) % 255))},
+                        100,
+                        Math.floor((step + (3 * x)) % 255))},
                             0,
                             0
                         )`;
-                        cx.fillRect((state.piece.px + x) * PX_SCALE, (state.piece.py + y) * PX_SCALE, PX_SCALE, PX_SCALE);
-                    }
+                    cx.fillRect((state.piece.px + x) * PX_SCALE, (state.piece.py + y) * PX_SCALE, PX_SCALE, PX_SCALE);
                 }
             }
-            if(time - start < 3000){
-                requestAnimationFrame(animate);
-            }
-            else resolve(state.score);
         }
-        requestAnimationFrame(animate);
-    }))
+        if (time - start < 3000) {
+            requestAnimationFrame(animate);
+        }
+        else menu(state.score);
+    }
+    requestAnimationFrame(animate);
 }
 
+
 function game() {
-    let cx = init();
+    let cx = initGameDisplay();
     let state = State.start();
     draw(state, cx);
 
@@ -119,52 +166,50 @@ function game() {
         "z": 200
     }
 
-    for(let k of keys){
+    for (let k of keys) {
         throttledKeys[k] = performance.now();
     }
 
     let lastStep;
 
-    return new Promise((resolve) => {
-        function run(time){
-            if(lastStep === undefined){
-                lastStep = time;
-            }
-    
-            let finalKeys = Object.create(null);
-    
-            for(let key of Object.keys(pressedKeys)){
-                if(pressedKeys[key] && time - throttledKeys[key] > throttleTiming[key]){
-                    throttledKeys[key] = time;
-                    finalKeys[key] = true;
-                }
-            }
-    
-            if(Object.keys(finalKeys).length > 0){
-                if(finalKeys["ArrowDown"]) {lastStep = time};
-                state = state.update(state, finalKeys);
-                draw(state, cx);
-            }
-    
-            if(time - lastStep > 500){
-                let pressedDown = Object.create(null);
-                pressedDown["ArrowDown"] = true;
-                lastStep = time;
-                state = state.update(state, pressedDown);
-                draw(state, cx);
-            }
-            
-            if(state.status == "playing"){
-                requestAnimationFrame(run);
-            }
-            else {
-                lastStep = performance.now();
-                resolve(runLostAnimation(state, cx));
+
+    function run(time) {
+        if (lastStep === undefined) {
+            lastStep = time;
+        }
+
+        let finalKeys = Object.create(null);
+
+        for (let key of Object.keys(pressedKeys)) {
+            if (pressedKeys[key] && time - throttledKeys[key] > throttleTiming[key]) {
+                throttledKeys[key] = time;
+                finalKeys[key] = true;
             }
         }
-        requestAnimationFrame(run);
-    });
-    
+
+        if (Object.keys(finalKeys).length > 0) {
+            if (finalKeys["ArrowDown"]) { lastStep = time };
+            state = state.update(state, finalKeys);
+            draw(state, cx);
+        }
+
+        if (time - lastStep > 500) {
+            let pressedDown = Object.create(null);
+            pressedDown["ArrowDown"] = true;
+            lastStep = time;
+            state = state.update(state, pressedDown);
+            draw(state, cx);
+        }
+
+        if (state.status == "playing") {
+            requestAnimationFrame(run);
+        }
+        else {
+            lastStep = performance.now();
+            runLostAnimation(state, cx);
+        }
+    }
+    requestAnimationFrame(run);
 }
 
-export {game};
+export { menu };
