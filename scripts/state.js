@@ -26,15 +26,15 @@ class State {
         return new State(grid, piece, status);
     }
 
-    isPointColliding({grid}, y, x) {
+    isPointColliding(grid, y, x) {
         if (x < 0 || x > GAME_WIDTH - 1 || y < 0 || y > GAME_HEIGHT - 1) return true;
         else return grid[y][x];
     }
 
-    isPieceColliding(state, piece) {
+    isPieceColliding(grid, piece) {
         for (let py = 0; py < 4; py++) {
             for (let px = 0; px < 4; px++) {
-                if (piece.get(py, px) && this.isPointColliding(state, piece.py + py, piece.px + px)) {
+                if (piece.get(py, px) && this.isPointColliding(grid, piece.py + py, piece.px + px)) {
                     return true;
                 }
             }
@@ -63,9 +63,9 @@ class State {
         return new State(state.grid, state.piece, state.status, state.score + scoreGained);
     }
 
-    _rotatePiece(state) {
-        let piece = this.isPieceColliding(state, state.piece.rotate(state.piece)) ? state.piece : state.piece.rotate(state.piece);
-        return new State(state.grid, piece, state.status, state.score);
+    _rotatePiece({grid, piece, status, score}) {
+        piece = this.isPieceColliding(grid, piece.rotate(piece)) ? piece : piece.rotate(piece);
+        return new State(grid, piece, status, score);
     }
 
     /**
@@ -73,43 +73,39 @@ class State {
      * the update is broken down into separate horizontal and vertical functions
      */
 
-    _updateHor(state, pressedKeys) {
-        let piece = state.piece;
+    _updateHor({grid, piece, status, score}, pressedKeys) {
         if (pressedKeys["ArrowLeft"]) {
-            piece = this.isPieceColliding(state, state.piece.moveLeft(state.piece)) ? piece : state.piece.moveLeft(state.piece);
+            piece = this.isPieceColliding(grid, piece.moveLeft(piece)) ? piece : piece.moveLeft(piece);
         } else
             if (pressedKeys["ArrowRight"]) {
-                piece = this.isPieceColliding(state, state.piece.moveRight(state.piece)) ? piece : state.piece.moveRight(state.piece);
+                piece = this.isPieceColliding(grid, piece.moveRight(piece)) ? piece : piece.moveRight(piece);
             }
-        return new State(state.grid, piece, state.status, state.score);
+        return new State(grid, piece, status, score);
     }
 
-    _updateVert(state) {
-        let piece = state.piece;
-        let grid = state.grid;
-        let status = state.status;
-        if (this.isPieceColliding(state, state.piece.moveDown(state.piece))) {
+    _updateVert({piece, grid, status, score}) {
+        if (this.isPieceColliding(grid, piece.moveDown(piece))) {
             for (let y = 0; y < 4; y++) {
                 for (let x = 0; x < 4; x++) {
-                    if (state.piece.get(y, x)) {
-                        state.grid[state.piece.py + y][state.piece.px + x] = true;
+                    if (piece.get(y, x)) {
+                        grid[piece.py + y][piece.px + x] = true;
                     }
                 }
             }
             piece = new Piece(0, (GAME_WIDTH / 2) - 2);
 
-            /* 
-            if the new shape collides with background on creation the game is lost
+            /** 
+             * if the new shape collides with background on creation the game is lost
              */
 
-            if (this.isPieceColliding(state, piece.moveDown(piece)) && piece.py == 0) {
+            if (this.isPieceColliding(grid, piece.moveDown(piece)) && piece.py == 0) {
                 status = "lost";
             }
         }
         else {
-            piece = state.piece.moveDown(state.piece);
+            piece = piece.moveDown(piece);
         }
-        return new State(grid, piece, status, state.score);
+        return new State(grid, piece, status, score);
     }
 
 
@@ -124,8 +120,7 @@ class State {
         return finishedRows;
     }
 
-    shiftGridDownAtRow(row, gr) {
-        let grid = gr;
+    shiftGridDownAtRow(row, grid) {
         for (let y = row - 1; y >= 0; y--) {
             for (let x = 0; x < GAME_WIDTH; x++) {
                 if (grid[y][x]) {
