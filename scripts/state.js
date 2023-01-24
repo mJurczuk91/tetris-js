@@ -26,9 +26,9 @@ class State {
         return new State(grid, piece, status);
     }
 
-    isPointColliding(state, y, x) {
+    isPointColliding({grid}, y, x) {
         if (x < 0 || x > GAME_WIDTH - 1 || y < 0 || y > GAME_HEIGHT - 1) return true;
-        else return state.grid[y][x];
+        else return grid[y][x];
     }
 
     isPieceColliding(state, piece) {
@@ -60,10 +60,6 @@ class State {
         }
 
         let scoreGained = complete.length * 100 * complete.length;
-        if (complete.length > 0) {
-            let p = document.getElementById("score");
-            p.innerText = state.score + scoreGained;
-        }
         return new State(state.grid, state.piece, state.status, state.score + scoreGained);
     }
 

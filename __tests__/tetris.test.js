@@ -16,7 +16,7 @@ function getStateWithFilledLines(lines){
 }
 
 
-test("isColliding method detects collision of piece with grid background", () => {
+test("isPieceColliding method detects collision of piece with grid background", () => {
     let state = getStateWithFilledLines([4,5]);
 
     expect(state.isPieceColliding(state, state.piece)).toBe(false);
@@ -33,13 +33,13 @@ test("state update moves the piece when arrow keys are pressed", () => {
 
     expect(pieceStartingX).toBe((GAME_WIDTH/2) - 2);
 
-    state = state.update(state, {"ArrowRight": true});
+    state = state.update(state, {ArrowRight: true});
     expect(state.piece.px).toBe(pieceStartingX + 1);
 
-    state = state.update(state, {"ArrowLeft": true});
+    state = state.update(state, {ArrowLeft: true});
     expect(state.piece.px).toBe(pieceStartingX);
 
-    state = state.update(state, {"ArrowDown": true});
+    state = state.update(state, {ArrowDown: true});
     expect(state.piece.py).toBe(pieceStartingY + 1);
     expect(state.piece.px).toBe(pieceStartingX);
 });
@@ -51,4 +51,10 @@ test("state removeRow function removes a finished row and shifts the grid down 1
 
     expect(state.grid[15][6]).toBe(true);
     expect(state.grid[15][7]).toBe(false);
-})
+});
+
+test("game detects losing conditions properly", () => {
+    let state = getStateWithFilledLines([1,2,3]);
+    state = state.update(state, {ArrowDown: true});
+    expect(state.status).toBe("lost");
+});

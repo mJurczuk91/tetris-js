@@ -117,9 +117,9 @@ function trackKeys(keys) {
 }
 
 /**
- * called through resolving the game() promise
+ * called after game is lost
  * runs a quick animation (color changing) for the piece that lost the game
- * returns a promise that resolves to final game score after the animation finishes
+ * calls the menu function after animation is finished with final score as parameter
  */
 
 function runLostAnimation(state, cx) {
@@ -130,7 +130,6 @@ function runLostAnimation(state, cx) {
         for (let y = 0; y < 4; y++) {
             for (let x = 0; x < 4; x++) {
                 if (state.piece.get(y, x)) {
-
                     cx.fillStyle = `rgb(
                             ${Math.max(
                         100,
@@ -153,6 +152,7 @@ function runLostAnimation(state, cx) {
 
 function game() {
     let cx = initGameDisplay();
+    let score = document.getElementById("score");
     let state = State.start();
     draw(state, cx);
 
@@ -171,13 +171,12 @@ function game() {
     }
 
     let lastStep;
-
-
     function run(time) {
         if (lastStep === undefined) {
             lastStep = time;
         }
 
+        score = state.score;
         let finalKeys = Object.create(null);
 
         for (let key of Object.keys(pressedKeys)) {
@@ -205,7 +204,6 @@ function game() {
             requestAnimationFrame(run);
         }
         else {
-            lastStep = performance.now();
             runLostAnimation(state, cx);
         }
     }
