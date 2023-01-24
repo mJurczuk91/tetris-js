@@ -98,7 +98,7 @@ class State {
              * if the new shape collides with background on creation the game is lost
              */
 
-            if (this.isPieceColliding(grid, piece.moveDown(piece)) && piece.py == 0) {
+            if (this.isPieceColliding(grid, piece)) {
                 status = "lost";
             }
         }
